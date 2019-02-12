@@ -1,0 +1,38 @@
+﻿@using iclips_teste.Models;
+@using iclips_teste.Enum;
+@{
+    Layout = "";
+    var viewDataPessoas = (List<Pessoas>)ViewData["Pessoas"];
+    var viewDataSituacao = (Situacao)ViewData["Situacao"];
+    var viewCountEmAtendimento = viewDataPessoas.Where(x => x.Situacao.Equals(Situacao.EM_ANDAMENTO)).Count();
+    var viewCountAtrasado = viewDataPessoas.Where(x => x.Situacao.Equals(Situacao.ATRASADO)).Count();
+    if (viewDataSituacao != Situacao.NENHUM)
+    {
+        viewDataPessoas = viewDataPessoas.Where(x => x.Situacao.Equals(viewDataSituacao)).ToList();
+    }
+}
+
+@foreach (var pessoa in viewDataPessoas)
+{
+    <div class="d-flex bd-highlight flex-row row-container">
+        <div class="bd-highlight flex-column checkbox-container">
+            <label class="container">
+                <input class="ck__js" type="checkbox" onchange="onCheckedItem(this)">
+                <span class="checkmark"></span>
+            </label>
+        </div>
+        <div class="bd-highlight flex-column flex-fill text-left" style="width: 200px">@pessoa.Nome</div>
+        <div class="bd-highlight flex-column flex-fill text-left" style="width: 200px">@pessoa.Email</div>
+        <div class="bd-highlight flex-column flex-fill text-center" style="width: 200px">
+            @if (pessoa.Situacao.Equals(Situacao.EM_ANDAMENTO))
+            {
+                <label class="label-iclips blue">Novo</label>
+            }
+            else if (pessoa.Situacao.Equals(Situacao.ATRASADO))
+            {
+                <label class="label-iclips blue">Novo</label>
+            }
+        </div>
+    </div>
+}
+

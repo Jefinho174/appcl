@@ -1,0 +1,76 @@
+﻿@using iclips_teste.Models;
+@using iclips_teste.Enum;
+@{
+    ViewBag.Title = "Home Page";
+    var viewDataPessoas = (List<Pessoas>) ViewData["Pessoas"];
+    var viewDataSituacao = (Situacao) ViewData["Situacao"];
+    var viewCountEmAtendimento = viewDataPessoas.Where(x => x.Situacao.Equals(Situacao.EM_ANDAMENTO)).Count();
+    var viewCountAtrasado = viewDataPessoas.Where(x => x.Situacao.Equals(Situacao.ATRASADO)).Count();
+    if (viewDataSituacao != Situacao.NENHUM)
+    {
+        viewDataPessoas = viewDataPessoas.Where(x => x.Situacao.Equals(viewDataSituacao)).ToList();
+    }
+}
+<div class="container-fluid h-100 p-0">
+    <div class="d-flex bd-highlight  h-100">
+        <aside class="bd-highlight align-items-stretch aside-menu">
+            <nav class="aside-nav">
+                <ul class="aside-nav-list">
+                    <li class="aside-nav-item">
+                        <a class="@(viewDataSituacao.Equals(Situacao.EM_ANDAMENTO) ? "active-item":"") d-flex justify-content-between" href="@Url.Action("EmAtendimento", "Home")">
+                            <span class="title">em andamento</span> <span class="label-n">@viewCountEmAtendimento</span>
+                        </a>
+                    </li>
+                    <li class="aside-nav-item">
+                        <a class="@(viewDataSituacao.Equals(Situacao.ATRASADO) ? "active-item":"") d-flex justify-content-between" href="@Url.Action("Cancelado", "Home")">
+                            <span class="title">atrasadas</span> <span class="label-n">@viewCountAtrasado</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <article class="flex-shrink-1 flex-grow-1 bd-highlight article-container">
+            <section class="section-container">
+                <div class="section-header d-flex justify-content-between align-items-center">
+                    <div class="title">Em andamento</div>
+                    <div class="action"><button class="btn-iclips" onclick="OrdenasPessoas()">Cadastrar lorem</button></div>
+                </div>
+                <div class="section-body" id="section-body__js">
+                    @foreach (var pessoa in viewDataPessoas)
+                    {
+                        <div class="d-flex bd-highlight row-container">
+                            <div class="bd-highlight flex-column checkbox-container">
+                                <label class="container">
+                                    <input class="ck__js" type="checkbox" onchange="onCheckedItem(this)">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            <div class="bd-highlight  flex-fill text-left" style="width: 200px">@pessoa.Nome</div>
+                            <div class="bd-highlight  flex-fill text-left" style="width: 200px">@pessoa.Email</div>
+                            <div class="bd-highlight  flex-fill text-center" style="width: 200px">
+                                @if (pessoa.Situacao.Equals(Situacao.EM_ANDAMENTO))
+                                {
+                                    <label class="label-iclips blue">Novo</label>
+                                }
+                                else if (pessoa.Situacao.Equals(Situacao.ATRASADO))
+                                {
+                                    <label class="label-iclips pink">Novo</label>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
+        </article>
+    </div>
+</div>
+<script>
+    function OrdenasPessoas() {
+        $.ajax({
+            url: "@Url.Action("OrdenasPessoas", "Home", new { value = Convert.ToInt32(viewDataSituacao) })", success: function (result) {
+                var doc = result;
+                $("#section-body__js").html(doc);
+            }
+        });
+    }
+</script>
